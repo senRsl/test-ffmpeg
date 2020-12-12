@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 背景颜色 -->
+    <item android:drawable="@color/white" />
+
+    <item
+        android:bottom="30dp"
+        android:left="3dp"
+        android:right="3dp">
+        <bitmap
+            android:gravity="bottom|center_horizontal"
+            android:scaleType="center"
+            android:src="@drawable/logo2" />
+    </item>
+
+
+</layer-list>
