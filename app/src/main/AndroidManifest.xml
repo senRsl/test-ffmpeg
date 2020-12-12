@@ -23,6 +23,8 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".Test01VersionActivity"/>
+
     </application>
 
 </manifest>

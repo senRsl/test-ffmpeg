@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">test-ffmpeg</string>
+
+    <string name="get_version">getVersion</string>
+
 </resources>

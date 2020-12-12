@@ -1,7 +1,8 @@
 package dc.test.ffmpeg
 
+import android.graphics.Color
+import android.view.View
 import dc.android.base.activity.BridgeActivity
-import dc.common.Logger
 
 /**
  *
@@ -14,27 +15,18 @@ import dc.common.Logger
  */
 class TestActivity : BridgeActivity() {
 
-    init {
-        System.loadLibrary("utils")
-        System.loadLibrary("avutil")
-    }
-
-    external fun getVersion(): String
-    external fun getVersion431(): String
-
 
     override fun initLayout() {
         super.initLayout()
-
+        setLayout(true,R.layout.activity_test,true, Color.WHITE)
     }
 
-    override fun initData() {
-        super.initData()
 
-//        2020-12-12 17:42:21.866 15060-15060/dc.test.ffmpeg W/TEST: 	0：dc.test.ffmpeg.TestActivity
-//        1：N-100400-g001bc594d8
-//        2：4.3.1
-        Logger.w(javaClass.canonicalName, getVersion(), getVersion431())
+    fun onclick(v: View) {
+        when (v.id) {
+            R.id.btn_get_version -> Test01VersionActivity.start(this)
+        }
+
     }
 
 }
