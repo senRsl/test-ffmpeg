@@ -1,2 +1,3 @@
-include ':app'
+include ':a_jni'
+include ':a_ffmpeg'
 rootProject.name = "test-ffmpeg"
