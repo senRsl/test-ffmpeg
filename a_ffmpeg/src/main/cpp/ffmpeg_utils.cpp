@@ -2,6 +2,7 @@
 #include <jni.h>
 
 extern "C" {
+
 #include <libavutil/avutil.h>
 
 JNIEXPORT jstring JNICALL

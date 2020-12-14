@@ -18,13 +18,14 @@ class TestActivity : BridgeActivity() {
 
     override fun initLayout() {
         super.initLayout()
-        setLayout(true,R.layout.activity_test,true, Color.WHITE)
+        setLayout(true, R.layout.activity_test, true, Color.WHITE)
     }
 
 
     fun onclick(v: View) {
         when (v.id) {
             R.id.btn_get_version -> Test01VersionActivity.start(this)
+            R.id.btn_get_audio_info -> Test03PlayAudioActivity.start(this)
         }
 
     }

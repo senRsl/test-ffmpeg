@@ -24,6 +24,7 @@
         </activity>
 
         <activity android:name=".Test01VersionActivity"/>
+        <activity android:name=".Test03PlayAudioActivity"/>
 
     </application>
 
