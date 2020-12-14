@@ -17,7 +17,7 @@ import dc.common.Logger
 class Test01VersionActivity : BridgeActivity() {
 
     init {
-        System.loadLibrary("utils")
+        System.loadLibrary("ffutils")
         System.loadLibrary("avutil")
     }
 

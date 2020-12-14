@@ -19,7 +19,7 @@ file(GLOB CPP_DIR src/main/cpp/*.cpp)
 file(GLOB FFMPEG_DIR src/main/cpp/include/*.c)
 
 # 添加自己写的 C/C++源文件
-add_library(utils #so名称
+add_library(ffutils #so名称
         SHARED #动态库
         ${CPP_DIR}
         ${FFMPEG_DIR}
@@ -30,7 +30,7 @@ find_library(log-lib log)
 
 #  链接库
 target_link_libraries(
-        utils
+        ffutils
         ${SO_DIR}
         jnigraphics
         ${log-lib})
