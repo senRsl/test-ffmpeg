@@ -32,6 +32,7 @@ extern "C"{
             LOGE("Can't open file: %s", av_err2str(open_res));
             return env->NewStringUTF("1111111111");
         }
+
         //3，获取文件信息
         //读取一部分视音频数据并且获得一些相关的信息，会检测一些重要字段，如果是空白的，就设法填充它们。
         // 因为我们解析文件头的时候，已经掌握了大量的信息，avformat_find_stream_info 就是通过这些信息来填充自己的成员，
@@ -58,6 +59,7 @@ extern "C"{
         LOGE("extradata_size: %d", audio_stream->codecpar->extradata_size);
 
         __avformat_close:
+        //5,关闭
         avformat_close_input(&avFormatContext);
 
         return env->NewStringUTF("22222222Intellij竟然不支持C++插件也没有。。。。");
