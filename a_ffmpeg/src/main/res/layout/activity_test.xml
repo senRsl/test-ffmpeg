@@ -20,4 +20,12 @@
         android:text="@string/audio_info"
         android:textAllCaps="false" />
 
+    <Button
+        android:id="@+id/btn_get_audio_play"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="onclick"
+        android:text="@string/audio_play"
+        android:textAllCaps="false" />
+
 </LinearLayout>
