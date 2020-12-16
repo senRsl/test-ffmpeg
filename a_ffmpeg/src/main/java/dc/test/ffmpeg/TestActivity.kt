@@ -27,6 +27,7 @@ class TestActivity : BridgeActivity() {
             R.id.btn_get_version -> Test01VersionActivity.start(this)
             R.id.btn_get_audio_info -> Test03PlayAudioActivity.start(this)
             R.id.btn_get_audio_play -> Test04PlayAudioActivity.start(this)
+            R.id.btn_get_audio_record -> Test05AudioRecordActivity.start(this)
         }
 
     }

@@ -26,6 +26,7 @@
         <activity android:name=".Test01VersionActivity" />
         <activity android:name=".Test03PlayAudioActivity" />
         <activity android:name=".Test04PlayAudioActivity" />
+        <activity android:name=".Test05AudioRecordActivity" />
 
     </application>
 

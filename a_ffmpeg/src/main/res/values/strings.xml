@@ -4,5 +4,6 @@
     <string name="get_version">getVersion</string>
     <string name="audio_info">audio info</string>
     <string name="audio_play">audio play</string>
+    <string name="audio_record">audio record</string>
 
 </resources>
