@@ -58,7 +58,7 @@ class Test05AudioRecordActivity : BridgeActivity() {
     var isRecording = false;    //停止录制pcm
     var isAudioRecording = false; //停止编码audio
     var isMuxerStatus = false     //混合器 启动状态
-    var lastPTSUs = 0L
+    var lastPTS = 0L
 
     fun startAudioRecord() {
         Logger.w(this, "startAudioRecord")
@@ -117,14 +117,18 @@ class Test05AudioRecordActivity : BridgeActivity() {
 
                     //二期，保存pcm到mp4
 
-                    var bufferIndex = audioCodec.dequeueInputBuffer(0)
+                    //long timeoutUs：用于等待返回可用buffer的时间
+                    //timeoutUs == 0立马返回
+                    //timeoutUs < 0无限期等待可用buffer
+                    //timeoutUs > 0等待timeoutUs时间
+                    var bufferIndex = audioCodec.dequeueInputBuffer(0)  //返回用于填充有效数据输入buffer的索引，如果当前没有可用buffer则返回-1
                     if (bufferIndex < 0) {
                         SystemClock.sleep(10)
                         continue
                     }
                     var byteBuffer =
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            audioCodec.getInputBuffer(bufferIndex)
+                            audioCodec.getInputBuffer(bufferIndex)  //获取需要编码数据的输入流队列，返回的是一个ByteBuffer数组
                         } else {
                             audioCodec.inputBuffers[bufferIndex]
                         }
@@ -137,9 +141,10 @@ class Test05AudioRecordActivity : BridgeActivity() {
 
                     //presentationTimeUs += (1.0 * bufferSize / (sampleRate * 2 * (audioFormat / 8)) * 1000000).toLong()
                     //Logger.w("pcm一帧 时间戳 " + presentationTimeUs / 1000000)
-                    var ptsus = getPTSUs()
-                    Logger.w("pcm一帧 时间戳 $ptsus")
-                    audioCodec.queueInputBuffer(bufferIndex, 0, readSize, ptsus, 0)
+                    var pts = getPTSUs()
+                    Logger.w("pcm一帧 时间戳 $pts")
+                    audioCodec.queueInputBuffer(bufferIndex, 0, readSize, pts, 0) //将填充好的buffer发给MediaCodec
+
 
                 } else {
                     Logger.w("pcm采集异常", readSize)
@@ -156,7 +161,7 @@ class Test05AudioRecordActivity : BridgeActivity() {
 
     fun getPTSUs(): Long {
         var result = System.nanoTime() / 1000L
-        if (result < lastPTSUs) result = lastPTSUs
+        if (result < lastPTS) result = lastPTS
         return result
     }
 
@@ -246,7 +251,7 @@ class Test05AudioRecordActivity : BridgeActivity() {
                 if (outBufferIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
                     bufferInfo.presentationTimeUs = getPTSUs()
                     audioTrackIndex = mediaMuxer.addTrack(audioCodec.outputFormat)
-                    lastPTSUs = bufferInfo.presentationTimeUs
+                    lastPTS = bufferInfo.presentationTimeUs
 
                     Logger.w("音频轨道 已添加", bufferInfo.size, bufferInfo.presentationTimeUs)
                     //音频音轨 和视频音轨?添加完成后，启动混合器
