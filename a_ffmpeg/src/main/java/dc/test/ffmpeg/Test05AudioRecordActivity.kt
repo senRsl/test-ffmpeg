@@ -67,6 +67,11 @@ class Test05AudioRecordActivity : BridgeActivity() {
 
                     if (!isAllGrant) return
 
+                    //音频编码，视频编码，音视频合成muxer
+                    initAudioCodec()
+                    initVideoCodec()
+                    initMediaMuxer()
+
                     startAudioRecord()
                     initCamera()
                 }
@@ -117,10 +122,11 @@ class Test05AudioRecordActivity : BridgeActivity() {
 
             Logger.w(dir?.absoluteFile, dir?.freeSpace, file?.exists(), bos)
 
-            //音频编码，视频编码，音视频合成muxer
-            initAudioCodec()
-            initVideoCodec()
-            initMediaMuxer()
+            //初始化配置往上挪
+//            //音频编码，视频编码，音视频合成muxer
+//            initAudioCodec()
+//            initVideoCodec()
+//            initMediaMuxer()
 
             isAudioRecording = true
             AudioCodecThread().start()
@@ -296,6 +302,9 @@ class Test05AudioRecordActivity : BridgeActivity() {
             while (isAudioRecording) {
 
                 //获取一帧解码完成的数据到bufferInfo，没有数据就阻塞
+                //已成功解码的输出buffer的索引或INFO_*常量之一(INFO_TRY_AGAIN_LATER, INFO_OUTPUT_FORMAT_CHANGED 或 INFO_OUTPUT_BUFFERS_CHANGED)。
+                //返回INFO_TRY_AGAIN_LATER而timeoutUs指定为了非负值，表示超时了。
+                //返回INFO_OUTPUT_FORMAT_CHANGED表示输出格式已更改，后续数据将遵循新格式。
                 var outBufferIndex = audioCodec.dequeueOutputBuffer(bufferInfo, 0)
                 Logger.w(javaClass.canonicalName, outBufferIndex)
 
@@ -321,7 +330,11 @@ class Test05AudioRecordActivity : BridgeActivity() {
                             continue
                         }
 
+                        //获取编解码之后的数据输出流队列，使用outBufferIndex索引，拿到输出buffer
                         var outputBuffer = audioCodec.getOutputBuffers()[outBufferIndex]
+                        //半天找到这么个解释。。。。
+                        //如果API<=19，需要根据BufferInfo的offset偏移量调整ByteBuffer的位置
+                        //并且限定将要读取缓存区数据的长度，否则输出数据会混乱
                         outputBuffer.position(bufferInfo.offset)
                         outputBuffer.limit(bufferInfo.offset + bufferInfo.size)
 
@@ -343,9 +356,13 @@ class Test05AudioRecordActivity : BridgeActivity() {
                         //编码后的音频数据写入混合器
                         mediaMuxer.writeSampleData(audioTrackIndex, outputBuffer, bufferInfo)
 
-                        var data = ByteArray(outputBuffer.remaining())
+                        //压榨剩余价值
+                        var data = ByteArray(outputBuffer.remaining())  //remaining 剩余
                         outputBuffer.get(data, 0, data.size)
 
+                        //将输出buffer返回给codec或将其渲染在输出surface。
+                        //boolean render：如果在配置codec时指定了一个有效的surface，则传递true会将此输出buffer在surface上渲染。一旦不再使用buffer，该surface将把buffer释放回codec。
+                        //处理完成，释放ByteBuffer数据。
                         audioCodec.releaseOutputBuffer(outBufferIndex, false)
                         outBufferIndex = audioCodec.dequeueOutputBuffer(bufferInfo, 0)
 
@@ -498,7 +515,7 @@ class Test05AudioRecordActivity : BridgeActivity() {
                         //val image =
                         //录出来绿屏。。。。
                         //onPreviewFrame默认返回格式为 he default will be the YCbCr_420_SP (NV21) format
-
+                        //采用MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar格式录制，把NV21转成NV12保存即可解决
                         var yuv420sp = ByteArray(videoWidth * videoHeight * 3 / 2)
                         convertNv21ToNv12(data, yuv420sp, videoWidth, videoHeight)
 
@@ -623,6 +640,11 @@ class Test05AudioRecordActivity : BridgeActivity() {
             j += 2
         }
     }
+
+    //问题遗留1：
+    // 存储的mp4使用 IINA播放器无法播放，表现为音频正常播放，视频帧不动，时间进度显示也不动，
+    // 但使用QuickTime Player 表现均正常
+    // 奇怪，相同的视频 后来再用 IINA打开进度条又正常了。。。。
 
 
 }
