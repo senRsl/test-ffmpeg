@@ -8,7 +8,7 @@ extern "C" {
 JNIEXPORT jstring JNICALL
 Java_dc_test_ffmpeg_Test01VersionActivity_getVersion(JNIEnv *env, jclass clazz) {
     const char *version = av_version_info();
-    printf("getVersion is %s",version);
+    printf("getVersion is %s", version);
     return env->NewStringUTF(version);
 }
 

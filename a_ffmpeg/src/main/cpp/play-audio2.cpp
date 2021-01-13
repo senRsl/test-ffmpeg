@@ -3,7 +3,7 @@
 #include <android/log.h>
 
 //ffmpeg 是c写的，要用c的include
-extern "C"{
+extern "C" {
 #include "libavformat/avformat.h"
 #include "libswresample/swresample.h"
 };
@@ -22,9 +22,9 @@ jobject audioTrack;
  * @param env
  * @return
  */
-jobject initAudioTrack(JNIEnv *env){
+jobject initAudioTrack(JNIEnv *env) {
     jclass jAudioTrackClass = env->FindClass("android/media/AudioTrack");
-    jmethodID jAudioTrackCMid = env->GetMethodID(jAudioTrackClass,"<init>","(IIIIII)V"); //构造
+    jmethodID jAudioTrackCMid = env->GetMethodID(jAudioTrackClass, "<init>", "(IIIIII)V"); //构造
 
     //  public static final int STREAM_MUSIC = 3;
     int streamType = 3;
@@ -34,17 +34,21 @@ jobject initAudioTrack(JNIEnv *env){
     // public static final int ENCODING_PCM_16BIT = 2;
     int audioFormat = 2;
     // getMinBufferSize(int sampleRateInHz, int channelConfig, int audioFormat)
-    jmethodID jGetMinBufferSizeMid = env->GetStaticMethodID(jAudioTrackClass, "getMinBufferSize", "(III)I");
-    int bufferSizeInBytes = env->CallStaticIntMethod(jAudioTrackClass, jGetMinBufferSizeMid, sampleRateInHz, channelConfig, audioFormat);
+    jmethodID jGetMinBufferSizeMid = env->GetStaticMethodID(jAudioTrackClass, "getMinBufferSize",
+                                                            "(III)I");
+    int bufferSizeInBytes = env->CallStaticIntMethod(jAudioTrackClass, jGetMinBufferSizeMid,
+                                                     sampleRateInHz, channelConfig, audioFormat);
     // public static final int MODE_STREAM = 1;
     int mode = 1;
 
     //创建了AudioTrack
-    jobject jAudioTrack = env->NewObject(jAudioTrackClass,jAudioTrackCMid, streamType, sampleRateInHz, channelConfig, audioFormat, bufferSizeInBytes, mode);
+    jobject jAudioTrack = env->NewObject(jAudioTrackClass, jAudioTrackCMid, streamType,
+                                         sampleRateInHz, channelConfig, audioFormat,
+                                         bufferSizeInBytes, mode);
 
     //play方法
-    jmethodID jPlayMid = env->GetMethodID(jAudioTrackClass,"play","()V");
-    env->CallVoidMethod(jAudioTrack,jPlayMid);
+    jmethodID jPlayMid = env->GetMethodID(jAudioTrackClass, "play", "()V");
+    env->CallVoidMethod(jAudioTrack, jPlayMid);
 
     // write method
     jAudioTrackWriteMid = env->GetMethodID(jAudioTrackClass, "write", "([BII)I");
@@ -56,20 +60,22 @@ jobject initAudioTrack(JNIEnv *env){
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_dc_test_ffmpeg_Test04PlayAudioActivity_printAudioInfo2(JNIEnv *env, jobject instance,jstring url_) {
+Java_dc_test_ffmpeg_Test04PlayAudioActivity_printAudioInfo2(JNIEnv *env, jobject instance,
+                                                            jstring url_) {
 
     const char *url = env->GetStringUTFChars(url_, 0);
 
-    LOGE("待播放地址%s",url);
+    LOGE("待播放地址%s", url);
 
 }
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_dc_test_ffmpeg_Test04PlayAudioActivity_nativePlay(JNIEnv *env, jobject instance,jstring url_) {
+Java_dc_test_ffmpeg_Test04PlayAudioActivity_nativePlay(JNIEnv *env, jobject instance,
+                                                       jstring url_) {
     const char *url = env->GetStringUTFChars(url_, 0);
 
-    LOGE("待播放地址%s",url_);
+    LOGE("待播放地址%s", url_);
 
     AVFormatContext *pFormatContext = NULL;
     AVCodecParameters *pCodecParameters = NULL;
@@ -102,8 +108,8 @@ Java_dc_test_ffmpeg_Test04PlayAudioActivity_nativePlay(JNIEnv *env, jobject inst
     ///1、初始化所有组件，只有调用了该函数，才能使用复用器和编解码器（源码）
     av_register_all();
     ///2、打开文件
-    int open_input_result = avformat_open_input(&pFormatContext,url,NULL,NULL);
-    if (open_input_result != 0){
+    int open_input_result = avformat_open_input(&pFormatContext, url, NULL, NULL);
+    if (open_input_result != 0) {
         LOGE("format open input error: %s", av_err2str(open_input_result));
         goto _av_resource_destroy;
     }
@@ -116,7 +122,8 @@ Java_dc_test_ffmpeg_Test04PlayAudioActivity_nativePlay(JNIEnv *env, jobject inst
     }
 
     ///4.、查找音频流的 index，后面根据这个index处理音频
-    audioStramIndex = av_find_best_stream(pFormatContext, AVMediaType::AVMEDIA_TYPE_AUDIO, -1, -1,NULL, 0);
+    audioStramIndex = av_find_best_stream(pFormatContext, AVMediaType::AVMEDIA_TYPE_AUDIO, -1, -1,
+                                          NULL, 0);
     if (audioStramIndex < 0) {
         LOGE("format audio stream error:");
         goto _av_resource_destroy;
@@ -142,18 +149,18 @@ Java_dc_test_ffmpeg_Test04PlayAudioActivity_nativePlay(JNIEnv *env, jobject inst
     ///5、打开解码器
     //分配AVCodecContext，默认值
     pCodecContext = avcodec_alloc_context3(pCodec);
-    if (pCodecContext == NULL){
+    if (pCodecContext == NULL) {
         LOGE("avcodec_alloc_context3 error");
         goto _av_resource_destroy;
     }
     //pCodecParameters 转 context
-    codecParametersToContextRes = avcodec_parameters_to_context(pCodecContext,pCodecParameters);
-    if(codecParametersToContextRes <0){
+    codecParametersToContextRes = avcodec_parameters_to_context(pCodecContext, pCodecParameters);
+    if (codecParametersToContextRes < 0) {
         LOGE("avcodec_parameters_to_context error");
         goto _av_resource_destroy;
     }
     //
-    codecOpenRes = avcodec_open2(pCodecContext,pCodec,NULL);
+    codecOpenRes = avcodec_open2(pCodecContext, pCodec, NULL);
     if (codecOpenRes != 0) {
         LOGE("codec audio open error: %s", av_err2str(codecOpenRes));
         goto _av_resource_destroy;
@@ -179,7 +186,8 @@ Java_dc_test_ffmpeg_Test04PlayAudioActivity_nativePlay(JNIEnv *env, jobject inst
     in_sample_fmt = pCodecContext->sample_fmt;
     in_sample_rate = pCodecContext->sample_rate;
     swrContext = swr_alloc_set_opts(NULL, out_ch_layout, out_sample_fmt,
-                                    out_sample_rate, in_ch_layout, in_sample_fmt, in_sample_rate, 0, NULL);
+                                    out_sample_rate, in_ch_layout, in_sample_fmt, in_sample_rate, 0,
+                                    NULL);
     if (swrContext == NULL) {
         // 提示错误
         LOGE("swr_alloc_set_opts error");
@@ -196,11 +204,12 @@ Java_dc_test_ffmpeg_Test04PlayAudioActivity_nativePlay(JNIEnv *env, jobject inst
 
     // size 是播放指定的大小，是最终输出的大小
     outChannels = av_get_channel_layout_nb_channels(out_ch_layout); //通道数
-    dataSize = av_samples_get_buffer_size(NULL, outChannels, pCodecParameters->frame_size,out_sample_fmt, 0);
+    dataSize = av_samples_get_buffer_size(NULL, outChannels, pCodecParameters->frame_size,
+                                          out_sample_fmt, 0);
     resampleOutBuffer = (uint8_t *) malloc(dataSize);
 
     //一帧一帧播放，while循环
-    while (av_read_frame(pFormatContext,pPacket) >=0){
+    while (av_read_frame(pFormatContext, pPacket) >= 0) {
         LOGE("单帧 01");
         // Packet 包，压缩的数据，解码成 pcm 数据
         //判断是音频帧
@@ -210,12 +219,12 @@ Java_dc_test_ffmpeg_Test04PlayAudioActivity_nativePlay(JNIEnv *env, jobject inst
         LOGE("单帧 02");
 
         //输入原数据到解码器
-        int codecSendPacketRes = avcodec_send_packet(pCodecContext,pPacket);
-        if (codecSendPacketRes == 0){
+        int codecSendPacketRes = avcodec_send_packet(pCodecContext, pPacket);
+        if (codecSendPacketRes == 0) {
             LOGE("单帧 05");
             //解码器输出解码后的数据 pFrame  AVCodecContext *avctx, AVFrame *frame
-            int codecReceiveFrameRes = avcodec_receive_frame(pCodecContext,pFrame);
-            if(codecReceiveFrameRes == 0){
+            int codecReceiveFrameRes = avcodec_receive_frame(pCodecContext, pFrame);
+            if (codecReceiveFrameRes == 0) {
                 index++;
                 LOGE("单帧 06");
 
@@ -237,7 +246,7 @@ Java_dc_test_ffmpeg_Test04PlayAudioActivity_nativePlay(JNIEnv *env, jobject inst
                 ///public int write(@NonNull byte[] audioData, int offsetInBytes, int sizeInBytes) {}
                 env->CallIntMethod(audioTrack, jAudioTrackWriteMid, jPcmDataArray, 0, dataSize);
 
-                LOGE("解码第 %d 帧dataSize =%d ", index , dataSize);
+                LOGE("解码第 %d 帧dataSize =%d ", index, dataSize);
 
                 // 解除 jPcmDataArray 的持有，让 javaGC 回收
                 env->DeleteLocalRef(jPcmDataArray);
@@ -261,7 +270,7 @@ Java_dc_test_ffmpeg_Test04PlayAudioActivity_nativePlay(JNIEnv *env, jobject inst
     av_packet_free(&pPacket);
 
     _av_resource_destroy:
-    if (pFormatContext != NULL){
+    if (pFormatContext != NULL) {
         avformat_close_input(&pFormatContext);
         avformat_free_context(pFormatContext);
         pFormatContext = NULL;
