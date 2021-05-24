@@ -237,8 +237,10 @@ class Test05AudioRecordActivity : BridgeActivity() {
 
         val format = MediaFormat.createAudioFormat(MediaFormat.MIMETYPE_AUDIO_AAC, 44100, 2) //单声道1，双声道2
         format.setInteger(MediaFormat.KEY_BIT_RATE, 96000)
-        format.setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC)
-        format.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, 8192)
+//        val format = MediaFormat.createAudioFormat(MediaFormat.MIMETYPE_AUDIO_AAC, 48000, 6) //单声道1，双声道2
+//        format.setInteger(MediaFormat.KEY_BIT_RATE, 24000)
+//        format.setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC)
+//        format.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, 8192)
 
         audioCodec.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
     }

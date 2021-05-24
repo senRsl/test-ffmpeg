@@ -12,6 +12,14 @@
         android:text="@string/get_version"
         android:textAllCaps="false" />
 
+    <EditText
+        android:id="@+id/et_file_path"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="onclick"
+        android:text="@string/file_path"
+        android:textAllCaps="false" />
+
     <Button
         android:id="@+id/btn_get_audio_info"
         android:layout_width="match_parent"

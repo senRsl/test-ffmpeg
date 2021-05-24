@@ -3,6 +3,8 @@ package dc.test.ffmpeg
 import android.graphics.Color
 import android.view.View
 import dc.android.base.activity.BridgeActivity
+import kotlinx.android.synthetic.main.activity_test.*
+
 
 /**
  *
@@ -25,11 +27,12 @@ class TestActivity : BridgeActivity() {
     fun onclick(v: View) {
         when (v.id) {
             R.id.btn_get_version -> Test01VersionActivity.start(this)
-            R.id.btn_get_audio_info -> Test03PlayAudioActivity.start(this)
-            R.id.btn_get_audio_play -> Test04PlayAudioActivity.start(this)
+            R.id.btn_get_audio_info -> Test03PlayAudioActivity.start(this, et_file_path.text.toString())
+            R.id.btn_get_audio_play -> Test04PlayAudioActivity.start(this, et_file_path.text.toString())
             R.id.btn_get_audio_record -> Test05AudioRecordActivity.start(this)
         }
 
     }
+
 
 }
